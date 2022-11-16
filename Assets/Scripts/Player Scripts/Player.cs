@@ -16,13 +16,15 @@ public class Player : MonoBehaviour
 
     //Player animation properties
     [HideInInspector] public string IS_RUNNING_TAG = "isRunning";
+    [HideInInspector] public string IS_ATTACKING_TAG = "isAttacking";
 
-    [HideInInspector] public Vector3 playerDirection;
+    [HideInInspector] public Vector3 input;
+    [HideInInspector] public Vector3 direction;
 
-
+    [Header("Player Characteristics")]
     //Player Parameters
     public float movementSpeed;
-
+    public float forwardJump;
 
     private void Awake()
     {
@@ -48,6 +50,7 @@ public class Player : MonoBehaviour
 
         this.behaviorsMap[typeof(PlayerIdleBehavior)] = new PlayerIdleBehavior();
         this.behaviorsMap[typeof(PlayerMoveBehavior)] = new PlayerMoveBehavior();
+        this.behaviorsMap[typeof(PlayerAttackBehavior)] = new PlayerAttackBehavior();
     }
 
     private void SetDefaultBehavior()
@@ -111,6 +114,12 @@ public class Player : MonoBehaviour
     public void SetBehaviorMove()
     {
         var behavior = this.GetBehavior<PlayerMoveBehavior>();
+        this.SetBehavior(behavior);
+    }
+
+    public void SetBehaviorAttack()
+    {
+        var behavior = this.GetBehavior<PlayerAttackBehavior>();
         this.SetBehavior(behavior);
     }
 }
