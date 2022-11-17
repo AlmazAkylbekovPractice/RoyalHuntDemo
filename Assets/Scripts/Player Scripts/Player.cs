@@ -24,7 +24,8 @@ public class Player : MonoBehaviour
     [Header("Player Characteristics")]
     //Player Parameters
     public float movementSpeed;
-    public float forwardJump;
+    public float forwardJumpDistance;
+    public float forwardJumpImpulse;
 
     private void Awake()
     {
