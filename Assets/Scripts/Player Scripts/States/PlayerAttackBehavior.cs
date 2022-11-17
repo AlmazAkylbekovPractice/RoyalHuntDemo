@@ -12,12 +12,14 @@ public class PlayerAttackBehavior : IPlayerBehavior
     {
         startPos = player.transform.position;
 
+        player.isAttacking = true;
         player.animator.SetBool(player.IS_ATTACKING_TAG,true);
 
     }
 
     public void Exit(Player player)
     {
+        player.isAttacking = false;
         player.animator.SetBool(player.IS_ATTACKING_TAG, false);
     }
 
