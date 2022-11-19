@@ -2,15 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using UnityEditor;
 
 public class Player : MonoBehaviour
 {
     [Header("Player Characteristics")]
     //Player Parameters
-    public float movementSpeed;
-    public float forwardJumpDistance;
-    public float forwardJumpImpulse;
-    public float recoverTime;
+    [HideInInspector] public float movementSpeed;
+    [HideInInspector] public float forwardJumpDistance;
+    [HideInInspector] public float forwardJumpImpulse;
+    [HideInInspector] public float recoverTime;
 
     [Header("Player Conditions")]
     public bool isAttacking;
@@ -24,8 +25,7 @@ public class Player : MonoBehaviour
     [HideInInspector] public CharacterController controller;
     [HideInInspector] public Animator animator;
     [SerializeField] private SkinnedMeshRenderer meshRenderer;
-
-    public Transform cam;
+    [HideInInspector] public Transform cam;
 
     //State Patter Properties
     private Dictionary<Type, IPlayerBehavior> behaviorsMap;
@@ -37,13 +37,17 @@ public class Player : MonoBehaviour
 
     [HideInInspector] public Vector3 input;
     [HideInInspector] public Vector3 direction;
-    private float timeRemaining;
 
     private void Awake()
     {
         LoadComponents();
         LoadStates();
-        LoadParameters();
+        LoadCharacteristics();
+    }
+
+    private void OnLevelWasLoaded()
+    {
+        cam = GameObject.FindWithTag("MainCamera").transform;
     }
 
     private void LoadComponents()
@@ -59,10 +63,14 @@ public class Player : MonoBehaviour
         this.SetDefaultBehavior();
     }
 
-    private void LoadParameters()
+    private void LoadCharacteristics()
     {
-        timeRemaining = recoverTime;
+        this.movementSpeed = GameManager.instance.GetSpeed;
+        this.forwardJumpImpulse = GameManager.instance.GetJumpForce;
+        this.forwardJumpDistance = GameManager.instance.GetJumpDistance;
+        this.recoverTime = GameManager.instance.GetRecoveryTime;
     }
+
 
     private void InitializeBehabiors()
     {
@@ -86,7 +94,6 @@ public class Player : MonoBehaviour
         if (this.currentBehavior != null)
         {
             this.currentBehavior.Update(this);
-            this.PlayerRecover();
         }
     }
 
@@ -144,14 +151,7 @@ public class Player : MonoBehaviour
         this.SetBehavior(behavior);
     }
 
-    public void OnTriggerEnter(Collider other)
-    {
-        if (other.gameObject.tag == "Player" && this.isAttacking)
-        {
-            hitScores += other.gameObject.GetComponent<Player>().ApplyDamage();
-        }
-    }
-
+    
     public int ApplyDamage()
     {
         int point = 0;
@@ -161,7 +161,12 @@ public class Player : MonoBehaviour
         {
             this.damageScores++;
             this.isHurted = true;
+
+            this.meshRenderer.material = meshRenderer.materials[2];
+
             point = 1;
+
+            Invoke("PlayerRecover", recoverTime);
         }
 
         return point;
@@ -169,19 +174,22 @@ public class Player : MonoBehaviour
 
     public void PlayerRecover()
     {
-        if (this.isHurted)
+        this.meshRenderer.material = meshRenderer.materials[1];
+        this.isHurted = false;
+    }
+
+    public void UpdateUI()
+    {
+        UInterfaceManager.instance.UpdateScore(hitScores);
+    }
+
+    public void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.tag == "Player" && this.isAttacking)
         {
-            if (timeRemaining > 0)
-            {
-                meshRenderer.material = meshRenderer.materials[2];
-                timeRemaining -= Time.deltaTime;
-            }
-            else
-            {
-                meshRenderer.material = meshRenderer.materials[1];
-                timeRemaining = recoverTime;
-                this.isHurted = false;
-            }
+            hitScores += other.gameObject.GetComponent<Player>().ApplyDamage();
+
+            UpdateUI();
         }
     }
 }

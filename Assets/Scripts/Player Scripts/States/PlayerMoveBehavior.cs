@@ -21,6 +21,15 @@ public class PlayerMoveBehavior : IPlayerBehavior
 
     public void FixedUpdate(Player player)
     {
+        if (player.input.magnitude >= 0)
+        {
+            float targetAngle = Mathf.Atan2(player.input.x, player.input.z) * Mathf.Rad2Deg + player.cam.eulerAngles.y;
+            float angle = Mathf.SmoothDampAngle(player.transform.eulerAngles.y, targetAngle, ref _turmSmoothvelocity, _turmSmoothTime);
+            player.transform.rotation = Quaternion.Euler(0f, angle, 0f);
+
+            player.direction = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward;
+        }
+
         player.controller.Move(player.direction.normalized * player.movementSpeed * Time.deltaTime);
     }
 
@@ -35,14 +44,7 @@ public class PlayerMoveBehavior : IPlayerBehavior
 
     public void Update(Player player)
     {
-        if (player.input.magnitude >= 0)
-        {
-            float targetAngle = Mathf.Atan2(player.input.x, player.input.z) * Mathf.Rad2Deg + player.cam.eulerAngles.y;
-            float angle = Mathf.SmoothDampAngle(player.transform.eulerAngles.y, targetAngle, ref _turmSmoothvelocity, _turmSmoothTime);
-            player.transform.rotation = Quaternion.Euler(0f, angle, 0f);
-
-            player.direction = Quaternion.Euler(0f,targetAngle,0f) * Vector3.forward;
-        }
+        
 
     }
 }
