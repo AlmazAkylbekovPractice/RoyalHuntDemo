@@ -25,7 +25,7 @@ public class Player : MonoBehaviour
     [HideInInspector] public CharacterController controller;
     [HideInInspector] public Animator animator;
     [SerializeField] private SkinnedMeshRenderer meshRenderer;
-    [HideInInspector] public Transform cam;
+    public Transform cam;
 
     //State Patter Properties
     private Dictionary<Type, IPlayerBehavior> behaviorsMap;
@@ -45,16 +45,12 @@ public class Player : MonoBehaviour
         LoadCharacteristics();
     }
 
-    private void OnLevelWasLoaded()
-    {
-        cam = GameObject.FindWithTag("MainCamera").transform;
-    }
-
     private void LoadComponents()
     {
         controller = GetComponent<CharacterController>();
         animator = GetComponent<Animator>();
         meshRenderer = GetComponentInChildren<SkinnedMeshRenderer>();
+        cam = GameObject.FindWithTag("MainCamera").transform;
     }
 
     private void LoadStates()
@@ -183,13 +179,12 @@ public class Player : MonoBehaviour
         UInterfaceManager.instance.UpdateScore(hitScores);
     }
 
-    public void OnTriggerEnter(Collider other)
+    private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.tag == "Player" && this.isAttacking)
         {
-            hitScores += other.gameObject.GetComponent<Player>().ApplyDamage();
-
-            UpdateUI();
+            this.hitScores += other.gameObject.GetComponent<Player>().ApplyDamage();
+            this.UpdateUI();
         }
     }
 }

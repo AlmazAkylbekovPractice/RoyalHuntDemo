@@ -7,6 +7,7 @@ using UnityEngine.UIElements;
 public class PlayerAttackBehavior : IPlayerBehavior
 {
     Vector3 startPos;
+    Vector3 lastPos;
 
     public void Enter(Player player)
     {
@@ -25,6 +26,8 @@ public class PlayerAttackBehavior : IPlayerBehavior
 
     public void FixedUpdate(Player player)
     {
+        lastPos = player.transform.position;
+
         if (player.forwardJumpDistance > Vector3.Distance(startPos, player.transform.position))
         {
             player.controller.Move(player.movementSpeed * player.forwardJumpImpulse * player.transform.TransformDirection(Vector3.forward) * Time.deltaTime);
@@ -46,7 +49,10 @@ public class PlayerAttackBehavior : IPlayerBehavior
 
     public void Update(Player player)
     {
-
+        if (Vector3.Distance(lastPos, player.transform.position) / Time.deltaTime < 0.01f)
+        {
+            player.SetBehaviorMove();
+        }
     }
 }
 
