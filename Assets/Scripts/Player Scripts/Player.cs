@@ -3,15 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using UnityEditor;
+using Mirror;
+using Cinemachine;
 
-public class Player : MonoBehaviour
+public class Player : NetworkBehaviour
 {
     [Header("Player Characteristics")]
     //Player Parameters
-    [HideInInspector] public float movementSpeed;
-    [HideInInspector] public float forwardJumpDistance;
-    [HideInInspector] public float forwardJumpImpulse;
-    [HideInInspector] public float recoverTime;
+    [SyncVar] [HideInInspector] public float movementSpeed;
+    [SyncVar] [HideInInspector] public float forwardJumpDistance;
+    [SyncVar] [HideInInspector] public float forwardJumpImpulse;
+    [SyncVar] [HideInInspector] public float recoverTime;
 
     [Header("Player Conditions")]
     public bool isAttacking;
@@ -25,7 +27,10 @@ public class Player : MonoBehaviour
     [HideInInspector] public CharacterController controller;
     [HideInInspector] public Animator animator;
     [SerializeField] private SkinnedMeshRenderer meshRenderer;
+
+    //Cameras
     public Transform cam;
+    public CinemachineFreeLook freeLookCam;
 
     //State Patter Properties
     private Dictionary<Type, IPlayerBehavior> behaviorsMap;
@@ -38,19 +43,46 @@ public class Player : MonoBehaviour
     [HideInInspector] public Vector3 input;
     [HideInInspector] public Vector3 direction;
 
-    private void Awake()
+    private void Start()
     {
-        LoadComponents();
-        LoadStates();
-        LoadCharacteristics();
+        
+
+        if (isServer)
+        {
+            LoadCharacteristics();
+        }
+
+        if (isClient && isLocalPlayer)
+        {
+            //SendPlayerInput();
+            LoadComponents();
+            LoadCameras();
+            LoadStates();
+        }
     }
 
     private void LoadComponents()
     {
-        controller = GetComponent<CharacterController>();
-        animator = GetComponent<Animator>();
-        meshRenderer = GetComponentInChildren<SkinnedMeshRenderer>();
+        controller = this.GetComponent<CharacterController>();
+        animator = this.GetComponent<Animator>();
+        meshRenderer = this.GetComponentInChildren<SkinnedMeshRenderer>();
+    }
+
+    private void SendPlayerInput()
+    {
+        InputManager.Instance.SetPlayer(this);
+    }
+
+    private void LoadCameras()
+    {
+
         cam = GameObject.FindWithTag("MainCamera").transform;
+
+        freeLookCam = CinemachineFreeLook.FindObjectOfType<CinemachineFreeLook>();
+
+        freeLookCam.LookAt = this.gameObject.transform;
+        freeLookCam.Follow = this.gameObject.transform;
+
     }
 
     private void LoadStates()
@@ -87,10 +119,14 @@ public class Player : MonoBehaviour
     /// </summary>
     private void Update()
     {
-        if (this.currentBehavior != null)
+        if (isLocalPlayer)
         {
-            this.currentBehavior.Update(this);
+            if (this.currentBehavior != null)
+            {
+                this.currentBehavior.Update(this);
+            }
         }
+        
     }
 
     /// <summary>
@@ -98,10 +134,14 @@ public class Player : MonoBehaviour
     /// </summary>
     private void FixedUpdate()
     {
-        if (this.currentBehavior != null)
+        if (isLocalPlayer)
         {
-            this.currentBehavior.FixedUpdate(this);
+            if (this.currentBehavior != null)
+            {
+                this.currentBehavior.FixedUpdate(this);
+            }
         }
+        
     }
 
     /// <summary>
@@ -109,10 +149,14 @@ public class Player : MonoBehaviour
     /// </summary>
     private void LateUpdate()
     {
-        if (this.currentBehavior != null)
+        if (isLocalPlayer)
         {
-            this.currentBehavior.InputHandler(this);
+            if (this.currentBehavior != null)
+            {
+                this.currentBehavior.InputHandler(this);
+            }
         }
+        
     }
 
     private void SetBehavior(IPlayerBehavior newBehavior)
@@ -147,7 +191,6 @@ public class Player : MonoBehaviour
         this.SetBehavior(behavior);
     }
 
-    
     public int ApplyDamage()
     {
         int point = 0;
@@ -168,11 +211,13 @@ public class Player : MonoBehaviour
         return point;
     }
 
+
     public void PlayerRecover()
     {
         this.meshRenderer.material = meshRenderer.materials[1];
         this.isHurted = false;
     }
+
 
     public void UpdateUI()
     {
@@ -181,10 +226,14 @@ public class Player : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.tag == "Player" && this.isAttacking)
+        if (isLocalPlayer)
         {
-            this.hitScores += other.gameObject.GetComponent<Player>().ApplyDamage();
-            this.UpdateUI();
+            if (other.gameObject.tag == "Player" && this.isAttacking)
+            {
+                this.hitScores += other.gameObject.GetComponent<Player>().ApplyDamage();
+                this.UpdateUI();
+            }
         }
+        
     }
 }
