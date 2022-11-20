@@ -8,6 +8,9 @@ using Cinemachine;
 
 public class Player : NetworkBehaviour
 {
+    [SyncVar] private Vector3 syncPos;
+    [SyncVar] private Quaternion syncRot;
+ 
     [Header("Player Characteristics")]
     //Player Parameters
     [SyncVar] [HideInInspector] public float movementSpeed;
@@ -45,8 +48,6 @@ public class Player : NetworkBehaviour
 
     private void Start()
     {
-        
-
         if (isServer)
         {
             LoadCharacteristics();
@@ -54,9 +55,9 @@ public class Player : NetworkBehaviour
 
         if (isClient && isLocalPlayer)
         {
-            //SendPlayerInput();
+            SendPlayerInput();
             LoadComponents();
-            LoadCameras();
+            OnStartLocalPlayer();
             LoadStates();
         }
     }
@@ -73,16 +74,19 @@ public class Player : NetworkBehaviour
         InputManager.Instance.SetPlayer(this);
     }
 
-    private void LoadCameras()
+    public void MovePlayer(Vector3 movementInput)
     {
+        this.input = movementInput;
+    }
 
+    public override void OnStartLocalPlayer()
+    {
         cam = GameObject.FindWithTag("MainCamera").transform;
 
         freeLookCam = CinemachineFreeLook.FindObjectOfType<CinemachineFreeLook>();
 
         freeLookCam.LookAt = this.gameObject.transform;
         freeLookCam.Follow = this.gameObject.transform;
-
     }
 
     private void LoadStates()
@@ -119,14 +123,31 @@ public class Player : NetworkBehaviour
     /// </summary>
     private void Update()
     {
-        if (isLocalPlayer)
+        if (isOwned)
         {
+            cmdSyncPlanePosition(this.transform.position, this.transform.rotation);
+
             if (this.currentBehavior != null)
             {
                 this.currentBehavior.Update(this);
             }
         }
-        
+    }
+
+    [Command]
+    private void cmdSyncPlanePosition(Vector3 currentPosition, Quaternion currentRotation)
+    {
+        ServerSyncPlayer(currentPosition, currentRotation);
+    }
+
+    [ClientRpc]
+    private void ServerSyncPlayer(Vector3 currentPosition, Quaternion currentRotation)
+    {
+        if (!isLocalPlayer)
+        {
+            transform.position = currentPosition;
+            transform.rotation = currentRotation;
+        }
     }
 
     /// <summary>
@@ -134,29 +155,28 @@ public class Player : NetworkBehaviour
     /// </summary>
     private void FixedUpdate()
     {
-        if (isLocalPlayer)
+        if (isOwned)
         {
             if (this.currentBehavior != null)
             {
                 this.currentBehavior.FixedUpdate(this);
             }
         }
-        
     }
+
 
     /// <summary>
     /// Used for handling player input
     /// </summary>
     private void LateUpdate()
     {
-        if (isLocalPlayer)
+        if (isOwned)
         {
             if (this.currentBehavior != null)
             {
                 this.currentBehavior.InputHandler(this);
             }
         }
-        
     }
 
     private void SetBehavior(IPlayerBehavior newBehavior)
@@ -224,6 +244,7 @@ public class Player : NetworkBehaviour
         UInterfaceManager.instance.UpdateScore(hitScores);
     }
 
+    [Client]
     private void OnTriggerEnter(Collider other)
     {
         if (isLocalPlayer)

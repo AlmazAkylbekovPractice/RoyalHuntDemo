@@ -22,9 +22,6 @@ public class PlayerIdleBehavior : IPlayerBehavior
 
     public void InputHandler(Player player)
     {
-        player.input.x = Input.GetAxis("Horizontal");
-        player.input.z = Input.GetAxis("Vertical");
-
         if (player.input.magnitude != 0) player.SetBehaviorMove();
         if (Input.GetMouseButtonDown(0)) player.SetBehaviorAttack();
     }

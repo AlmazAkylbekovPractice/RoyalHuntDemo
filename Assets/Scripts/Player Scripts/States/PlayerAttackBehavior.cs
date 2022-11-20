@@ -40,9 +40,6 @@ public class PlayerAttackBehavior : IPlayerBehavior
     {
         if (player.forwardJumpDistance <= Vector3.Distance(startPos, player.transform.position))
         {
-            player.input.x = Input.GetAxis("Horizontal");
-            player.input.z = Input.GetAxis("Vertical");
-
             if (player.input.magnitude == 0) player.SetBehaviorIdle();
             else player.SetBehaviorMove();
         }

@@ -27,7 +27,8 @@ public class InputManager : MonoBehaviour
 
     private void Update()
     {
-        MoveInput();
+        if (playerObj != null)
+            MoveInput();
     }
 
     public void SetPlayer(Player p)
@@ -39,5 +40,7 @@ public class InputManager : MonoBehaviour
     {
         movementInput.x = Input.GetAxis("Horizontal");
         movementInput.z = Input.GetAxis("Vertical");
+
+        playerObj.MovePlayer(movementInput);
     }
 }

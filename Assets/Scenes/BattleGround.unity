@@ -406,7 +406,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &212517262
 Transform:
   m_ObjectHideFlags: 0
@@ -1651,8 +1651,8 @@ MonoBehaviour:
   autoStartServerBuild: 1
   autoConnectClientBuild: 0
   sendRate: 30
-  offlineScene: 
-  onlineScene: 
+  offlineScene: Assets/Scenes/BattleGround.unity
+  onlineScene: Assets/Scenes/BattleGround.unity
   transport: {fileID: 1289924688}
   networkAddress: localhost
   maxConnections: 4

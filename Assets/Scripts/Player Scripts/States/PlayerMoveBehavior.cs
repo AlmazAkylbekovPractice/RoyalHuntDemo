@@ -36,9 +36,6 @@ public class PlayerMoveBehavior : IPlayerBehavior
 
     public void InputHandler(Player player)
     {
-        player.input.x = Input.GetAxis("Horizontal");
-        player.input.z = Input.GetAxis("Vertical");
-
         if (player.input.magnitude == 0) player.SetBehaviorIdle();
         if (Input.GetMouseButtonDown(0)) player.SetBehaviorAttack();
     }

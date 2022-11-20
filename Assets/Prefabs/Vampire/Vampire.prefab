@@ -3137,6 +3137,7 @@ MonoBehaviour:
   damageScores: 0
   controller: {fileID: 0}
   animator: {fileID: 0}
+  meshRenderer: {fileID: 0}
   cam: {fileID: 0}
   freeLookCam: {fileID: 0}
   IS_RUNNING_TAG: isRunning
@@ -3186,11 +3187,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f74aedd71d9a4f55b3ce499326d45fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  syncDirection: 0
+  syncDirection: 1
   syncMode: 0
   syncInterval: 0
   target: {fileID: 7055362970984188755}
-  clientAuthority: 0
+  clientAuthority: 1
   onlySyncOnChange: 1
   bufferResetMultiplier: 5
   positionSensitivity: 0.01
@@ -3217,7 +3218,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0.1
-  clientAuthority: 0
+  clientAuthority: 1
   animator: {fileID: 7683844175602995686}
 --- !u!1 &8188505833655606323
 GameObject:
