@@ -588,26 +588,6 @@ Transform:
   m_Father: {fileID: 1170692282}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &419097700 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8693857006816721869, guid: 67e6b0dd534214efe82c965aeefec477, type: 3}
-  m_PrefabInstance: {fileID: 819408652}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &419097704
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 419097700}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cfabb0440166ab443bba8876756fdfa9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_EffectColor: {r: 0, g: 0, b: 0, a: 0.5}
-  m_EffectDistance: {x: 3.85, y: 0.65}
-  m_UseGraphicAlpha: 1
 --- !u!1 &420324527
 GameObject:
   m_ObjectHideFlags: 0
@@ -1435,26 +1415,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: 521bc4e05614b3d4e8d0d60accdfa377, type: 3}
   m_PrefabInstance: {fileID: 1122856611}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1132201343 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8693857006035837639, guid: 67e6b0dd534214efe82c965aeefec477, type: 3}
-  m_PrefabInstance: {fileID: 819408652}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1132201347
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1132201343}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cfabb0440166ab443bba8876756fdfa9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_EffectColor: {r: 0, g: 0, b: 0, a: 0.5}
-  m_EffectDistance: {x: 3.85, y: 0.65}
-  m_UseGraphicAlpha: 1
 --- !u!1 &1170692281
 GameObject:
   m_ObjectHideFlags: 0
@@ -1651,8 +1611,8 @@ MonoBehaviour:
   autoStartServerBuild: 1
   autoConnectClientBuild: 0
   sendRate: 30
-  offlineScene: Assets/Scenes/BattleGround.unity
-  onlineScene: Assets/Scenes/BattleGround.unity
+  offlineScene: 
+  onlineScene: 
   transport: {fileID: 1289924688}
   networkAddress: localhost
   maxConnections: 4

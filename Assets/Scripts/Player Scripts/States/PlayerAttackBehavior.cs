@@ -32,8 +32,22 @@ public class PlayerAttackBehavior : IPlayerBehavior
         if (player.forwardJumpDistance > Vector3.Distance(startPos, player.transform.position))
         {
             player.controller.Move(player.movementSpeed * player.forwardJumpImpulse * player.transform.TransformDirection(Vector3.forward) * Time.deltaTime);
-        }
 
+            //foreach (var item in Physics.OverlapSphere(player.transform.position, 0.5f)){
+
+            //    Player p = item.GetComponent<Player>();
+
+            //    if (p)
+            //    {
+            //        if (p.netId != player.netId && !p.isHurted)
+            //        {
+            //            player.CountAsHit();
+            //            p.ApplyDamage();
+            //        }
+            //    }
+
+            //}
+        }
     }
 
     public void InputHandler(Player player)

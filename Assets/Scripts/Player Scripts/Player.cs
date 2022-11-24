@@ -8,9 +8,6 @@ using Cinemachine;
 
 public class Player : NetworkBehaviour
 {
-    [SyncVar] private Vector3 syncPos;
-    [SyncVar] private Quaternion syncRot;
- 
     [Header("Player Characteristics")]
     //Player Parameters
     [SyncVar] [HideInInspector] public float movementSpeed;
@@ -24,12 +21,20 @@ public class Player : NetworkBehaviour
     public bool isFreezed;
 
     [Header("Player Points")]
-    [SerializeField] private int hitScores;
-    [SerializeField] private int damageScores;
+    [SerializeField] public int hitScores;
+    [SyncVar(hook = nameof(SyncHitScorePoints))]
+    [SerializeField] private int syncHitScores;
+
+    [SerializeField] public int injuredScores;
+    [SyncVar(hook = nameof(SyncInjuredScorePoints))]
+    [SerializeField] private int syncInjuredScores;
 
     [HideInInspector] public CharacterController controller;
     [HideInInspector] public Animator animator;
     [SerializeField] private SkinnedMeshRenderer meshRenderer;
+
+    //Layers
+    [SerializeField] public LayerMask playerLayer;
 
     //Cameras
     public Transform cam;
@@ -87,6 +92,8 @@ public class Player : NetworkBehaviour
 
         freeLookCam.LookAt = this.gameObject.transform;
         freeLookCam.Follow = this.gameObject.transform;
+
+        UInterfaceManager.instance.UpdateScore(syncHitScores, syncInjuredScores);
     }
 
     private void LoadStates()
@@ -123,9 +130,9 @@ public class Player : NetworkBehaviour
     /// </summary>
     private void Update()
     {
-        if (isOwned)
+        if (isLocalPlayer)
         {
-            cmdSyncPlanePosition(this.transform.position, this.transform.rotation);
+            CmdSyncPlanePosition(this.transform.position);
 
             if (this.currentBehavior != null)
             {
@@ -135,27 +142,27 @@ public class Player : NetworkBehaviour
     }
 
     [Command]
-    private void cmdSyncPlanePosition(Vector3 currentPosition, Quaternion currentRotation)
+    private void CmdSyncPlanePosition(Vector3 currentPosition)
     {
-        ServerSyncPlayer(currentPosition, currentRotation);
+        RpcServerSyncPlayer(currentPosition);
     }
 
     [ClientRpc]
-    private void ServerSyncPlayer(Vector3 currentPosition, Quaternion currentRotation)
+    private void RpcServerSyncPlayer(Vector3 currentPosition)
     {
         if (!isLocalPlayer)
         {
             transform.position = currentPosition;
-            transform.rotation = currentRotation;
         }
     }
+
 
     /// <summary>
     /// Used for player physics
     /// </summary>
     private void FixedUpdate()
     {
-        if (isOwned)
+        if (isLocalPlayer)
         {
             if (this.currentBehavior != null)
             {
@@ -164,13 +171,12 @@ public class Player : NetworkBehaviour
         }
     }
 
-
     /// <summary>
     /// Used for handling player input
     /// </summary>
     private void LateUpdate()
     {
-        if (isOwned)
+        if (isLocalPlayer)
         {
             if (this.currentBehavior != null)
             {
@@ -211,50 +217,105 @@ public class Player : NetworkBehaviour
         this.SetBehavior(behavior);
     }
 
-    public int ApplyDamage()
+    public void ApplyDamage()
     {
-        int point = 0;
-        float timer = recoverTime;
-
-        if (!this.isHurted)
-        {
-            this.damageScores++;
-            this.isHurted = true;
-
-            this.meshRenderer.material = meshRenderer.materials[2];
-
-            point = 1;
-
-            Invoke("PlayerRecover", recoverTime);
-        }
-
-        return point;
+        //if (isServer)
+        //    ChangeInjuredScoreValue(this.injuredScores + 1);
+        //else
+        //    CmdChangeInjuredScores(this.injuredScores + 1);
     }
 
+    public void CountAsHit()
+    {
+        //if (isServer)
+        //    ChangeHitScoreValue(this.hitScores + 1);
+        //else
+        //    CmdChangeHitScores(this.hitScores + 1);
+
+    }
 
     public void PlayerRecover()
     {
-        this.meshRenderer.material = meshRenderer.materials[1];
-        this.isHurted = false;
+        if (isLocalPlayer)
+        {
+            this.meshRenderer.material = this.meshRenderer.materials[1];
+            this.isHurted = false;
+        }
     }
-
 
     public void UpdateUI()
     {
-        UInterfaceManager.instance.UpdateScore(hitScores);
+        if (!isLocalPlayer) return;
+        UInterfaceManager.instance.UpdateScore(syncHitScores,syncInjuredScores);
     }
 
-    [Client]
+    [ServerCallback]
     private void OnTriggerEnter(Collider other)
     {
-        if (isLocalPlayer)
+        if (other.GetComponent<Player>() != null)
         {
-            if (other.gameObject.tag == "Player" && this.isAttacking)
+            Player enemy = other.GetComponent<Player>();
+
+            if(this.netId != enemy.netId)
             {
-                this.hitScores += other.gameObject.GetComponent<Player>().ApplyDamage();
+                if (enemy.isAttacking && !this.isHurted)
+                {
+                    if (isServer)
+                        ChangeInjuredScoreValue(injuredScores + 1);
+                    else
+                        CmdChangeInjuredScores(injuredScores + 1);
+                }
+                else if (this.isAttacking && !enemy.isHurted)
+                {
+                    if (isServer)
+                        ChangeHitScoreValue(hitScores + 1);
+                    else
+                        CmdChangeHitScores(hitScores + 1);
+                }
+
                 this.UpdateUI();
             }
         }
-        
     }
+
+
+    private void SyncHitScorePoints(int oldHitScore, int newHitScore)
+    {
+        this.hitScores = newHitScore;
+    }
+
+    private void SyncInjuredScorePoints(int oldInjuredScore, int newInjuredScore)
+    {
+        this.injuredScores = newInjuredScore;
+    }
+
+    #region HitScoreHandlers
+    [Server]
+    public void ChangeHitScoreValue(int newHitScore)
+    {
+        syncHitScores = newHitScore;
+    }
+
+    [Command]
+    public void CmdChangeHitScores(int newScores)
+    {
+        ChangeHitScoreValue(newScores);
+    }
+    #endregion
+
+    #region InjuredScoreHangler
+    [Server]
+    public void ChangeInjuredScoreValue(int newInjuredScore)
+    {
+        syncInjuredScores = newInjuredScore;
+    }
+
+    [Command]
+    public void CmdChangeInjuredScores(int newScores)
+    {
+        ChangeInjuredScoreValue(newScores);
+    }
+    #endregion
+
+
 }

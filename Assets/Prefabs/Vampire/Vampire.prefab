@@ -3110,7 +3110,7 @@ CharacterController:
   m_StepOffset: 0.4
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.0001
-  m_Center: {x: 0, y: 1.05, z: 0}
+  m_Center: {x: 0, y: 1, z: 0}
 --- !u!114 &7683844175602995684
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3124,8 +3124,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   syncDirection: 0
-  syncMode: 0
-  syncInterval: 0.1
+  syncMode: 1
+  syncInterval: 0
   movementSpeed: 7
   forwardJumpDistance: 14
   forwardJumpImpulse: 3
@@ -3134,16 +3134,22 @@ MonoBehaviour:
   isHurted: 0
   isFreezed: 0
   hitScores: 0
-  damageScores: 0
+  syncHitScores: 0
+  injuredScores: 0
+  syncInjuredScores: 0
   controller: {fileID: 0}
   animator: {fileID: 0}
-  meshRenderer: {fileID: 0}
+  meshRenderer: {fileID: 5110656744541521450}
+  playerLayer:
+    serializedVersion: 2
+    m_Bits: 64
   cam: {fileID: 0}
   freeLookCam: {fileID: 0}
   IS_RUNNING_TAG: isRunning
   IS_ATTACKING_TAG: isAttacking
   input: {x: 0, y: 0, z: 0}
   direction: {x: 0, y: 0, z: 0}
+  UIPrefab: {fileID: 8693857007419983499, guid: 67e6b0dd534214efe82c965aeefec477, type: 3}
 --- !u!136 &7683844175602995685
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -3216,7 +3222,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   syncDirection: 0
-  syncMode: 0
+  syncMode: 1
   syncInterval: 0.1
   clientAuthority: 1
   animator: {fileID: 7683844175602995686}

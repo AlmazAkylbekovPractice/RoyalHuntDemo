@@ -7,7 +7,8 @@ public class UInterfaceManager : MonoBehaviour
 {
     public static UInterfaceManager instance;
 
-    [SerializeField] private Text score_text;
+    [SerializeField] private Text hitNum_text;
+    [SerializeField] private Text injuredNum_text;
 
     // Start is called before the first frame update
     void Awake()
@@ -22,8 +23,9 @@ public class UInterfaceManager : MonoBehaviour
         Cursor.lockState = CursorLockMode.Confined;
     }
 
-    public void UpdateScore(int inputScore)
+    public void UpdateScore(int scoreIn, int damageIn)
     {
-        score_text.text = inputScore.ToString();
+        hitNum_text.text = scoreIn.ToString();
+        injuredNum_text.text = damageIn.ToString();
     }
 }
