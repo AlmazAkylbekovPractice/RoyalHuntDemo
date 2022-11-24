@@ -14,14 +14,22 @@ public class PlayerAttackBehavior : IPlayerBehavior
     {
         startPos = player.transform.position;
 
-        player.isAttacking = true;
+        if (player.isServer)
+            player.ChangeIsAttacking(player.isAttacking = true);
+        else
+            player.CmdChangeIsAttacking(player.isAttacking = true);
+
         player.animator.SetBool(player.IS_ATTACKING_TAG,true);
 
     }
 
     public void Exit(Player player)
     {
-        player.isAttacking = false;
+        if (player.isServer)
+            player.ChangeIsAttacking(player.isAttacking = false);
+        else
+            player.CmdChangeIsAttacking(player.isAttacking = false);
+
         player.animator.SetBool(player.IS_ATTACKING_TAG, false);
     }
 
@@ -33,20 +41,6 @@ public class PlayerAttackBehavior : IPlayerBehavior
         {
             player.controller.Move(player.movementSpeed * player.forwardJumpImpulse * player.transform.TransformDirection(Vector3.forward) * Time.deltaTime);
 
-            //foreach (var item in Physics.OverlapSphere(player.transform.position, 0.5f)){
-
-            //    Player p = item.GetComponent<Player>();
-
-            //    if (p)
-            //    {
-            //        if (p.netId != player.netId && !p.isHurted)
-            //        {
-            //            player.CountAsHit();
-            //            p.ApplyDamage();
-            //        }
-            //    }
-
-            //}
         }
     }
 

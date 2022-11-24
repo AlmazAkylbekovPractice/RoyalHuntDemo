@@ -3124,15 +3124,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   syncDirection: 0
-  syncMode: 1
+  syncMode: 0
   syncInterval: 0
   movementSpeed: 7
   forwardJumpDistance: 14
   forwardJumpImpulse: 3
   recoverTime: 3
   isAttacking: 0
+  syncIsAttacking: 0
   isHurted: 0
-  isFreezed: 0
+  syncIsHurted: 0
   hitScores: 0
   syncHitScores: 0
   injuredScores: 0
@@ -3149,7 +3150,6 @@ MonoBehaviour:
   IS_ATTACKING_TAG: isAttacking
   input: {x: 0, y: 0, z: 0}
   direction: {x: 0, y: 0, z: 0}
-  UIPrefab: {fileID: 8693857007419983499, guid: 67e6b0dd534214efe82c965aeefec477, type: 3}
 --- !u!136 &7683844175602995685
 CapsuleCollider:
   m_ObjectHideFlags: 0

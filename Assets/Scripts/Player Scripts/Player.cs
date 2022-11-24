@@ -17,8 +17,13 @@ public class Player : NetworkBehaviour
 
     [Header("Player Conditions")]
     public bool isAttacking;
+    [SyncVar(hook = nameof(SyncIsAttacking))]
+    [SerializeField] private bool syncIsAttacking;
+
     public bool isHurted;
-    public bool isFreezed;
+    [SyncVar][SerializeField] private bool syncIsHurted;
+
+
 
     [Header("Player Points")]
     [SerializeField] public int hitScores;
@@ -36,7 +41,7 @@ public class Player : NetworkBehaviour
     //Layers
     [SerializeField] public LayerMask playerLayer;
 
-    //Cameras
+    //Cameras  
     public Transform cam;
     public CinemachineFreeLook freeLookCam;
 
@@ -258,14 +263,16 @@ public class Player : NetworkBehaviour
 
             if(this.netId != enemy.netId)
             {
-                if (enemy.isAttacking && !this.isHurted)
+                if (enemy.isAttacking)
                 {
                     if (isServer)
                         ChangeInjuredScoreValue(injuredScores + 1);
                     else
                         CmdChangeInjuredScores(injuredScores + 1);
                 }
-                else if (this.isAttacking && !enemy.isHurted)
+
+
+                if (this.isAttacking)
                 {
                     if (isServer)
                         ChangeHitScoreValue(hitScores + 1);
@@ -287,6 +294,11 @@ public class Player : NetworkBehaviour
     private void SyncInjuredScorePoints(int oldInjuredScore, int newInjuredScore)
     {
         this.injuredScores = newInjuredScore;
+    }
+
+    private void SyncIsAttacking(bool newAttack, bool oldAttack)
+    {
+        this.isAttacking = newAttack;
     }
 
     #region HitScoreHandlers
@@ -317,5 +329,15 @@ public class Player : NetworkBehaviour
     }
     #endregion
 
+    [Server]
+    public void ChangeIsAttacking(bool isAttacking)
+    {
+        syncIsAttacking = isAttacking;
+    }
 
+    [Command]
+    public void CmdChangeIsAttacking(bool isAttackingNew)
+    {
+        ChangeIsAttacking(isAttackingNew);
+    }
 }
